@@ -1,45 +1,49 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { Stack, router, Slot } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { getUser } from "@/services/operations/auth";
+import { UserProvider, useUser } from "@/context/UserContext";
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function AppLayout() {
+  const { user, setUser } = useUser();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = await SecureStore.getItemAsync("token");
+      if (!token) {
+        router.replace("/auth");
+        return;
+      }
+
+      const response = await getUser();
+      if (!response) {
+        router.replace("/auth");
+        return;
+      }
+
+      setUser(response);
+      setLoading(false);
+    };
+
+    fetchUserData();
+  }, [setUser]);
+
+  if (loading || !user) return null;
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Slot is needed to render matched routes */}
+      <Slot />
+    </Stack>
+  );
+}
+
+export default function LayoutWrapper() {
+  return (
+    <UserProvider>
+      <AppLayout />
+    </UserProvider>
   );
 }

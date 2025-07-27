@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "FitTracker",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.FitTracker.app"
     },
     "web": {
       "bundler": "metro",
@@ -33,10 +34,18 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b4e5efa6-1f2a-4310-b9b9-dbbeebe9b552"
+      }
+    },
+    "owner": "siddhantlm"
   }
 }
